@@ -50,6 +50,10 @@ public class Field {
 		// generate the field content
 		generate();
 	}
+	public int getRemainingMineCount() {
+		int remaining = getMineCount() - getNumberOf(State.MARKED);
+		return remaining;
+	}
 
 	public void openMine() {
 		for (int row = 0; row < getRowCount(); row++) {
