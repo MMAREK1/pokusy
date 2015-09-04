@@ -97,7 +97,6 @@ public class Fieldk implements Serializable {
 		}
 		Number up = null;
 		switch (command) {
-		case "W":
 		case "UP":
 			if (row != getRowCount() - 1) {
 				up = (Number) numbers[row + 1][column];
@@ -105,7 +104,6 @@ public class Fieldk implements Serializable {
 				up.setValue(0);
 			}
 			break;
-		case "S":
 		case "DOWN":
 			if (row != 0) {
 				up = (Number) numbers[row - 1][column];
@@ -113,7 +111,6 @@ public class Fieldk implements Serializable {
 				up.setValue(0);
 			}
 			break;
-		case "A":
 		case "LEFT":
 			if (column != (getColumnCount() - 1)) {
 				up = (Number) numbers[row][column + 1];
@@ -121,7 +118,6 @@ public class Fieldk implements Serializable {
 				up.setValue(0);
 			}
 			break;
-		case "D":
 		case "RIGHT":
 			if (column != 0) {
 				up = (Number) numbers[row][column - 1];

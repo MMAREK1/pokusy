@@ -6,6 +6,7 @@ import minesweeper.core.Tile.State;
  * Field represents playing field and game logic.
  */
 public class Field {
+	private int pomoc = 0;
 	/**
 	 * Playing field tiles.
 	 */
@@ -50,9 +51,41 @@ public class Field {
 		// generate the field content
 		generate();
 	}
+
 	public int getRemainingMineCount() {
 		int remaining = getMineCount() - getNumberOf(State.MARKED);
 		return remaining;
+	}
+
+	private void openNextTile(int chosenRow, int chosenColumn) {
+		int countOfMarks = 0;
+		for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+			int actRow = chosenRow + rowOffset;
+			if (actRow >= 0 && actRow < getRowCount()) {
+				for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
+					int actColumn = chosenColumn + columnOffset;
+					if (actColumn >= 0 && actColumn < getColumnCount()) {
+						if (getTile(actRow, actColumn).getState() == Tile.State.MARKED) {
+							countOfMarks++;
+						}
+					}
+				}
+			}
+		}
+		Clue clue = (Clue) getTile(chosenRow, chosenColumn);
+		for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+			int actRow = chosenRow + rowOffset;
+			if (actRow >= 0 && actRow < getRowCount()) {
+				for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
+					int actColumn = chosenColumn + columnOffset;
+					if (actColumn >= 0 && actColumn < getColumnCount()) {
+						if (getTile(actRow, actColumn).getState() != Tile.State.OPEN) {
+							openTile(actRow, actColumn);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public void openMine() {
@@ -67,7 +100,7 @@ public class Field {
 	}
 
 	/**
-	 * Opens tile at specified indeces.
+	 * Opens tile at specified index.
 	 * 
 	 * @param row
 	 *            - row number
@@ -77,21 +110,26 @@ public class Field {
 
 	public void openTile(int row, int column) {
 		Tile tile = tiles[row][column];
-		if (tile.getState() == Tile.State.CLOSED) {
-			tile.setState(Tile.State.OPEN);
-			if (tile instanceof Mine) {
-				state = GameState.FAILED;
-				return;
-			} else {
-				Clue clue = (Clue) tile;
-				if (clue.getValue() == 0) {
-					openAdjacentTiles(row, column);
+		if (tile.getState() == Tile.State.OPEN && pomoc == 0) {
+			openNextTile(row, column);
+		} else {
+			pomoc = 1;
+			if (tile.getState() == Tile.State.CLOSED) {
+				tile.setState(Tile.State.OPEN);
+				if (tile instanceof Mine) {
+					state = GameState.FAILED;
+					return;
+				} else {
+					Clue clue = (Clue) tile;
+					if (clue.getValue() == 0) {
+						openAdjacentTiles(row, column);
+					}
 				}
-			}
 
-			if (isSolved()) {
-				state = GameState.SOLVED;
-				return;
+				if (isSolved()) {
+					state = GameState.SOLVED;
+					return;
+				}
 			}
 		}
 	}
@@ -248,6 +286,14 @@ public class Field {
 	 */
 	public GameState getState() {
 		return state;
+	}
+
+	public int getPomoc() {
+		return pomoc;
+	}
+
+	public void setPomoc(int pomoc) {
+		this.pomoc = pomoc;
 	}
 
 	/**

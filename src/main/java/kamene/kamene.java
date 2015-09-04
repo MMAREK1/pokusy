@@ -17,27 +17,31 @@ public class kamene extends HttpServlet {
 		PrintWriter out = resp.getWriter();
 		resp.setContentType("text/html");
 		HttpSession session = req.getSession();
-		Fieldk field = (Fieldk) session.getAttribute("field");
+		Fieldk fieldk = (Fieldk) session.getAttribute("fieldk");
 		out.println("<html>");
 		out.println("<head>");
 		out.println("<title>");
 		out.println("Stones");
 		out.println("</title>");
 		out.println("</head>");
-		out.println("<body BGcolor=\"#3a6ea5\">");
-		if (field == null) {
-			field = new Fieldk(4, 4);
-			session.setAttribute("field", field);
+		out.println("<body>");
+		out.println("<center>");
+		if (fieldk == null || "new".equals(req.getParameter("move"))) {
+			fieldk = new Fieldk(4, 4);
+			session.setAttribute("fieldk", fieldk);
+		} else {
+			if (req.getParameter("move") != null) {
+				fieldk.move(req.getParameter("move").toUpperCase());
+			}
 		}
-		if (req.getParameter("move") != null) {
-			field.move(req.getParameter("move").toUpperCase());
+		if(fieldk.getState()==GameState.SOLVED){
+			session.setAttribute("fieldk", null);
+			out.println("Vyhral si!<br>");
 		}
-		for (int row = 0; row < field.getRowCount(); row++) {
-			for (int column = 0; column < field.getColumnCount(); column++) {
-				Number number = field.getNumber(row, column);
-				if (number.getValue() != 0) {
+		for (int row = 0; row < fieldk.getRowCount(); row++) {
+			for (int column = 0; column < fieldk.getColumnCount(); column++) {
+				Number number = fieldk.getNumber(row, column);
 					out.print("<img src=\"resources/images2/" + number.getValue() + ".png\" alt=\"sdf\"/>");
-				}
 			}
 			out.println("<br>");
 		}
@@ -64,6 +68,8 @@ public class kamene extends HttpServlet {
 		out.println("</td>");
 		out.println("</tr>");
 		out.println("</table>");
+		out.println("<a href=\"?move=new\">New Game</a>");
+		out.println("</center>");
 		out.println("</body>");
 		out.println("</html>");
 	}
